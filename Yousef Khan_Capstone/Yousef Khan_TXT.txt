@@ -1,0 +1,113 @@
+﻿Yousef Khan
+
+
+Capstone Project 
+Warby Parker Purchase Funnels
+Codecademy: Learn SQL from Scratch
+
+
+
+SELECT *
+FROM survey
+LIMIT 10;
+
+
+
+SELECT question,
+  COUNT(DISTINCT user_id) AS 'number of users answered'
+FROM survey
+GROUP BY question;
+
+
+
+SELECT *
+FROM quiz
+LIMIT 5;
+
+SELECT *
+FROM home_try_on
+LIMIT 5;
+
+SELECT *
+FROM purchase
+LIMIT 5;
+
+
+
+SELECT DISTINCT q.user_id,
+  h.user_id IS NOT NULL AS 'is_home_try_on',
+  h.number_of_pairs,
+  p.user_id IS NOT NULL AS 'is_purchase'
+FROM quiz AS 'q'
+LEFT JOIN home_try_on h
+  ON q.user_id = h.user_id
+LEFT JOIN purchase p
+  ON p.user_id = q.user_id
+LIMIT 10;
+
+
+
+WITH PFunnel AS
+        (SELECT Distinct q.user_id,
+        h.user_id IS NOT NULL AS 'is_home_try_on',
+        h.number_of_pairs,
+        p.user_id IS NOT NULL AS 'is_purchase'
+FROM quiz AS 'q'
+LEFT JOIN home_try_on AS 'h'
+        ON q.user_id = h.user_id
+LEFT JOIN purchase AS 'p'
+        ON h.user_id = p.user_id)
+SELECT 
+        COUNT(user_id) AS 'Total Number of Users', 
+        SUM(is_home_try_on) AS 'Home Try On Total',
+        SUM(is_purchase) AS 'Purchase Total',
+        100 * SUM(is_home_try_on) / COUNT(user_id) AS '% of Users that did Home Try On',
+        100 * SUM(is_purchase) / SUM(is_home_try_on) AS '% of Home Try On that Purchased'
+FROM PFunnel;
+
+
+
+WITH PFunnel AS
+        (SELECT Distinct q.user_id,
+        h.user_id IS NOT NULL AS 'is_home_try_on',
+        h.number_of_pairs,
+        p.user_id IS NOT NULL AS 'is_purchase'
+FROM quiz AS 'q'
+LEFT JOIN home_try_on AS 'h'
+        ON q.user_id = h.user_id
+LEFT JOIN purchase AS 'p'
+        ON h.user_id = p.user_id)
+SELECT 
+number_of_pairs,
+        COUNT(user_id) as 'Total Number of Users', 
+        SUM(is_home_try_on) as 'Home Try On Total',
+        SUM(is_purchase) as 'Purchase Total',
+        100 * SUM(is_purchase) / SUM(is_home_try_on) AS '% of Home Try on that Purchased'
+FROM PFunnel
+GROUP BY number_of_pairs;
+
+
+
+SELECT style,
+        COUNT (*) AS COUNT
+FROM quiz
+GROUP BY style;
+
+SELECT color,
+        COUNT (*) AS COUNT
+FROM quiz
+GROUP BY color
+ORDER BY 2 desc;
+
+
+
+SELECT product_id, 
+        style, 
+        model_name, 
+        color, 
+        COUNT(*) AS 'Number of Purchases', 
+        SUM (price) AS 'Total Sales',
+        price
+FROM purchase
+GROUP BY 1,2,3,4
+ORDER BY 6 desc;
